@@ -32,5 +32,7 @@ def authorized():
 
 if __name__ == '__main__':
     r = praw.Reddit('praw-examples/hello_oauth')
-    r.set_oauth_app_info(app_config_data.CLIENT_ID, app_config_data.CLIENT_SECRET, app_config_data.REDIRECT_URI)
+    r.set_oauth_app_info(app_config_data.CLIENT_ID,
+                         app_config_data.CLIENT_SECRET,
+                         app_config_data.REDIRECT_URI)
     app.run(debug=True, port=65010)
