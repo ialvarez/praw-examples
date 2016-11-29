@@ -7,32 +7,24 @@ app = Flask(__name__)
 
 @app.route('/')
 def homepage():
-    link_no_refresh = r.get_authorize_url('UniqueKey')
-    link_refresh = r.get_authorize_url('DifferentUniqueKey',
-                                       refreshable=True)
-    link_no_refresh = "<a href=%s>link</a>" % link_no_refresh
-    link_refresh = "<a href=%s>link</a>" % link_refresh
-    text = "First link. Not refreshable %s</br></br>" % link_no_refresh
-    text += "Second link. Refreshable %s</br></br>" % link_refresh
+    link = r.auth.url(['identity'], '...', 'permanent')
+    text = "<a href='{}'>LINK</a>".format(link)
     return text
 
 
 @app.route('/authorize_callback')
 def authorized():
-    state = request.args.get('state', '')
     code = request.args.get('code', '')
-    info = r.get_access_information(code)
-    user = r.get_me()
-    variables_text = "State=%s, code=%s, info=%s." % (state, code,
-                                                      str(info))
+    r.auth.authorize(code)
+    user = r.user.me()
     text = 'You are %s and have %u link karma.' % (user.name,
                                                    user.link_karma)
     back_link = "<a href='/'>Try again</a>"
-    return variables_text + '</br></br>' + text + '</br></br>' + back_link
+    return text + '</br></br>' + back_link
 
 if __name__ == '__main__':
-    r = praw.Reddit('praw-examples/hello_oauth')
-    r.set_oauth_app_info(app_config_data.CLIENT_ID,
-                         app_config_data.CLIENT_SECRET,
-                         app_config_data.REDIRECT_URI)
+    r = praw.Reddit(user_agent='praw-examples/hello_oauth',
+                    client_id=app_config_data.CLIENT_ID,
+                    client_secret=app_config_data.CLIENT_SECRET,
+                    redirect_uri=app_config_data.REDIRECT_URI)
     app.run(debug=True, port=65010)
