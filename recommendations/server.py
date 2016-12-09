@@ -28,7 +28,7 @@ def authorized():
 
     for sub in r.user.subreddits(limit=250):
         subs.append(template % (sub.display_name, sub.display_name))
-        recommendations = r.subreddit_recommendations(sub.display_name)
+        recommendations = r.subreddits.recommended([sub.display_name])
         for rec in recommendations:
             if rec.display_name not in already_rec:
                 recs.append(template % (rec.display_name, rec.display_name))
